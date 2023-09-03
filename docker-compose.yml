@@ -1,0 +1,52 @@
+version: "3.1"
+services:
+    db:
+        image: mysql
+        ports: 
+            - "3306:3306"
+        command: --default-authentication-plugin=mysql_native_password
+        environment:
+            MYSQL_DATABASE: wordpress
+            MYSQL_PASSWORD: root
+            MYSQL_ROOT_PASSWORD: root
+        volumes:
+            - ./dump:/docker-entrypoint-initdb.d
+            - ./conf:/etc/mysql/conf.d
+            - persistent:/var/lib/mysql
+        networks:
+          plugin-test-network:
+            ipv4_address: 172.18.0.2
+    www:
+        build: .
+        image: wpserver:latest
+        ports:
+            - "4003:4003"
+        volumes:
+            - ./www:/var/www/html
+        links:
+            - db
+        networks:
+          plugin-test-network:
+            ipv4_address: 172.18.0.4
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        links: 
+            - db:db
+        ports:
+            - 4004:4004
+        environment:
+            MYSQL_USER: root
+            MYSQL_PASSWORD: root
+            MYSQL_ROOT_PASSWORD: root 
+        networks:
+          plugin-test-network:
+            ipv4_address: 172.18.0.3
+volumes:
+    persistent:
+networks:
+  plugin-test-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.18.0.0/16"
