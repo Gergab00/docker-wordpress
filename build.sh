@@ -21,7 +21,8 @@ echo "Creando contenedores, imágenes, redes y volúmenes..."
 # Crear carpetas para los volúmenes
 mkdir -p mysql-data
 mkdir -p wp-content-site1 wp-themes-site1 wp-plugins-site1
-# mkdir -p wp-content-site2 wp-themes-site2 wp-plugins-site2
+mkdir -p wp-content-site2 wp-themes-site2 wp-plugins-site2
+mkdir -p wp-content-multisite wp-themes-multisite wp-plugins-multisite
 
 # Ejecutar Docker Compose
 docker-compose up -d

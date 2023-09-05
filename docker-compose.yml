@@ -10,27 +10,27 @@ services:
       separate_ip_network:
         ipv4_address: 172.18.0.2
     environment:
+      MYSQL_ROOT_USER: root
       MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: wordpress_db
-      MYSQL_USER: wordpress_user
-      MYSQL_PASSWORD: wordpress_password
     volumes:
       - ./mysql-data:/var/lib/mysql
-  wordpress:
+      - ./sql:/docker-entrypoint-initdb.d
+
+  wordpress-site1:
     image: wordpress:latest
-    container_name: wordpress
+    container_name: wordpress-site1
     depends_on:
       - mysql
     ports:
-      - "8080:80"
+      - "8082:80"  # Use a different port for the second site
     networks:
       separate_ip_network:
-        ipv4_address: 172.18.0.3
+        ipv4_address: 172.18.0.5  # Choose a different IP address
     environment:
       WORDPRESS_DB_HOST: 172.18.0.2
-      WORDPRESS_DB_NAME: wordpress_db
-      WORDPRESS_DB_USER: wordpress_user
-      WORDPRESS_DB_PASSWORD: wordpress_password
+      WORDPRESS_DB_NAME: wordpress_db_site1
+      WORDPRESS_DB_USER: wordpress_user_site1
+      WORDPRESS_DB_PASSWORD: wordpress_password_site1
       WORDPRESS_DEBUG: "true"
       WORDPRESS_NAME: "site-1"
     volumes:
@@ -38,6 +38,54 @@ services:
       - ./wp-themes-site1:/var/www/html/wp-content/themes
       - ./wp-plugins-site1:/var/www/html/wp-content/plugins
       - ./config/wp-config-site1.php:/var/www/html/wp-config.php
+
+  wordpress-site2:
+    image: wordpress:latest
+    container_name: wordpress-site2
+    depends_on:
+      - mysql
+    ports:
+      - "8083:80"  # Use a different port for the third site
+    networks:
+      separate_ip_network:
+        ipv4_address: 172.18.0.6  # Choose a different IP address
+    environment:
+      WORDPRESS_DB_HOST: 172.18.0.2
+      WORDPRESS_DB_NAME: wordpress_db_site2
+      WORDPRESS_DB_USER: wordpress_user_site2
+      WORDPRESS_DB_PASSWORD: wordpress_password_site2
+      WORDPRESS_DEBUG: "true"
+      WORDPRESS_NAME: "site-2"
+    volumes:
+      - ./wp-content-site2:/var/www/html/wp-content
+      - ./wp-themes-site2:/var/www/html/wp-content/themes
+      - ./wp-plugins-site2:/var/www/html/wp-content/plugins
+      - ./config/wp-config-site2.php:/var/www/html/wp-config.php
+
+  wordpress-multisite:
+    image: wordpress:latest
+    container_name: wordpress-multisite
+    depends_on:
+      - mysql
+    ports:
+      - "8084:80"  # Use a different port for the third site
+    networks:
+      separate_ip_network:
+        ipv4_address: 172.18.0.7 # Choose a different IP address
+    environment:
+      WORDPRESS_DB_HOST: 172.18.0.2
+      WORDPRESS_DB_NAME: wordpress_db_multisite
+      WORDPRESS_DB_USER: wordpress_user_multisite
+      WORDPRESS_DB_PASSWORD: wordpress_password_multisite
+      WORDPRESS_DEBUG: "true"
+      WORDPRESS_NAME: "multisite"
+    volumes:
+      - ./wp-content-multisite:/var/www/html/wp-content
+      - ./wp-themes-multisite:/var/www/html/wp-content/themes
+      - ./wp-plugins-multisite:/var/www/html/wp-content/plugins
+      - ./config/wp-config-multisite.php:/var/www/html/wp-config.php
+      - ./config/.htaccess-multisite:/var/www/html/.htaccess
+
   phpmyadmin:
     image: phpmyadmin:latest
     container_name: phpmyadmin
@@ -47,11 +95,12 @@ services:
       - "8081:80"
     networks:
       separate_ip_network:
-        ipv4_address: 172.18.0.4
+        ipv4_address: 172.18.0.3
     environment:
       PMA_HOST: 172.18.0.2
       PMA_USER: root
       PMA_PASSWORD: root_password
+
 networks:
   separate_ip_network:
     driver: bridge

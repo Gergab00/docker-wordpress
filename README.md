@@ -41,7 +41,7 @@ Si deseas limpiar completamente el ambiente y dejarlo como nuevo, ejecuta el scr
 ```bash
 ./clean.sh
 ```
-Esto eliminará las carpetas `mysql-data` y `wp-content1`, `wp-themes1`, `wp-plugins1` y detendrá los contenedores de Docker.
+Esto eliminará las carpetas `mysql-data` y `wp-content1`, `wp-themes1`, `wp-plugins1` así sucesivamente, despues eliminará las imágenes de Docker y las redes creadas.
 
 ## Licencia
 
